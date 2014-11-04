@@ -1,0 +1,66 @@
+//
+//  AppDelegate.m
+//  spritybird
+//
+//  Created by Alexis Creuzot on 09/02/2014.
+//  Copyright (c) 2014 Alexis Creuzot. All rights reserved.
+//
+
+#import "AppDelegate.h"
+
+@implementation AppDelegate
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    //[NANTracking setDebugMode: YES];
+    
+    NSString *host = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
+    if (host == nil) {
+        [NANTracking setQA: @"pqaapi5.nanigans.com"];
+    } else if ([host isEqualToString:@"PRODUCTION"]) {
+        [NANTracking setProduction];
+    } else {
+        [NANTracking setQA: host];
+    }
+    
+    NSString *appId = [[NSUserDefaults standardUserDefaults] objectForKey: @"appId"];
+    if (appId == nil) {
+        [NANTracking setNanigansAppId: @"8222" fbAppId: nil];
+    } else {
+        [NANTracking setNanigansAppId: appId fbAppId: nil];
+    }
+    
+    [NANTracking setUserId: [MCSMApplicationUUIDKeychainItem applicationUUID]];
+
+    [NANTracking trackAppLaunch: nil];
+
+    [[Tracking sharedInstance] trackUserEvent: @"game_launch" Value: @""];
+
+    return YES;
+}
+							
+- (void)applicationWillResignActive:(UIApplication *)application {
+    [[Tracking sharedInstance] trackUserEvent: @"game_resign_active" Value: @""];
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    [[Tracking sharedInstance] trackUserEvent: @"game_enter_background" Value: @""];
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+    [[Tracking sharedInstance] trackUserEvent: @"game_enter_foreground" Value: @""];
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    [[Tracking sharedInstance] trackUserEvent: @"game_become_active" Value: @""];
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application {
+    [[Tracking sharedInstance] trackUserEvent: @"game_terminate" Value: @""];
+}
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+    [NANTracking trackAppLaunch: url];
+    return YES;
+}
+
+@end
